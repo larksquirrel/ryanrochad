@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+<style type="text/css">
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+header {
+  background-color: #f8f8f8;
+  padding: 15px;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo a {
+  font-size: 28px;
+  text-decoration: none;
+  color: #000;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+}
+
+.nav-links li {
+  margin-left: 30px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #333;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  width: 300px;
+}
+
+.search-bar button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+}
+
+.user-actions a {
+  margin-left: 15px;
+  text-decoration: none;
+}
+
+.account-dropdown {
+  position: relative;
+}
+
+.account-dropdown ul {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 10px;
+  top: 100%;
+  right: 0;
+}
+
+.account-dropdown:hover ul {
+  display: block;
+}
+
+.account-dropdown ul li {
+  margin-bottom: 5px;
+}
+
+.account-dropdown ul li a {
+  color: #333;
+}
+
+.account-section {
+  background-color: #f4f4f4;
+  padding: 30px;
+  text-align: center;
+}
+
+.account-section h1 {
+  margin-bottom: 15px;
+}
+
+.account-section p {
+  margin-bottom: 20px;
+}
+
+.welcome-message {
+  text-align: right;
+}
+
+.account-details {
+  display: flex;
+  padding: 30px;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #f4f4f4;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar ul li {
+  padding: 10px;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: #777;
+}
+
+.main-content {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.verification-status {
+  color: #f00;
+  margin-bottom: 20px;
+}
+
+.complete-profile {
+  background-color: #004080;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.preferences-section {
+  background-color: #f4f4f4;
+  padding: 30px;
+}
+	</style>
+</head>
+
+<body>
+<header>
+    <nav>
+      <div class="logo">
+        Ryan Rochad's
+      </div>
+      <ul class="nav-links">
+        <li>Buy&nbsp;</li>
+        <li>Now&nbsp;</li>
+        <li>Sell&nbsp;</li>
+        <li>Browse&nbsp;</li>
+        <li>Service&nbsp;</li>
+      </ul>
+      <div class="search-bar">
+        <input type="text" placeholder="搜索瑞恩罗恰德">
+        <button type="submit"><img src="images/3cf56231255d641f25bad5ba1f3f80c.jpg"  alt="搜索图标" width="16" height="16"></button> 
+      </div>
+      <div class="user-actions">
+        <img src="images/6383d362206715e46663f1e78418cdf.jpg" alt="收藏图标" width="16" height="16"> 
+        <img src="images/15f2c0f7f16fbc07c6bf78638f6988b.jpg" alt="购物车图标" width="16" height="16"> 
+        <div class="account-dropdown">
+          My Account
+          <ul class="dropdown-menu">
+            <li>登出</li>
+            <li>简介</li>
+            <li>語言</li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="account-section">
+      <h1>Account information</h1>
+      <p>If you have any problems with your account, please contact customer service</p >
+      <div class="welcome-message">
+        <p>Welcome Mr.Xie</p >
+        <p>xieyuchen@RyanRochad.com</p >
+      </div>
+    </section>
+
+    <section class="account-details">
+      <div class="sidebar">
+        <ul>
+          <li>Account information</li>
+          <li>Auction</li>
+          <li>Information</li>
+          <li>Purchase history</li>
+          <li>Seller Central</li>
+        </ul>
+      </div>
+      <div class="main-content">
+        <h2>Account information</h2>
+        <div class="info-row">
+          <span>Yuchen Xie</span>
+          <span>xieyuchen@RyanRochad.com</span>
+          <span>password</span>
+       Change your password
+        </div>
+		    <div class="info-row">
+        
+				  <span> </span>
+          <span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Not certified!</span>
+          <span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;********</span>
+       &nbsp; &nbsp; &nbsp; &nbsp; Change your password</div>
+        <div class="verification-status">
+        
+        </div>
+        
+      
+		  
+		  <p><button class="complete-profile">Complete filling in your account information</button></p> 
+      </div>
+    </section>
+
+    <section class="preferences-section">
+      <h2>Account and auction preferences</h2>
+    
+    </section>
+  </main>
+</body>
+
+</html>
+
