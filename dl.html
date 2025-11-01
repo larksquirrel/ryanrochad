@@ -2,10 +2,9 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>瑞恩罗恰德</title>
+<title>Ryan Rochadd</title>
 
 	<style type="text/css">
-、
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -21,12 +20,12 @@ body {
     padding: 0 50px;
 }
 
-
 .left-section {
     background-color: white;
     padding: 30px;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    width: 400px;
 }
 
 .logo img {
@@ -57,6 +56,7 @@ form input {
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    box-sizing: border-box;
 }
 
 form button {
@@ -85,11 +85,6 @@ form button {
     margin: 0 5px;
 }
 
-.social-login img {
-    width: 30px;
-}
-
-
 .right-section {
     flex: 1;
     text-align: center;
@@ -98,6 +93,10 @@ form button {
 .right-section img {
     max-width: 100%;
     height: auto;
+}
+
+#signup-form {
+    display: none;
 }
 	</style>
 </head>
@@ -111,21 +110,148 @@ form button {
             <li class="active" id="login-tab">LOGIN</li>
             <li id="signup-tab">SIGN UP</li>
         </ul>
+        
+        <!-- 登录表单 -->
         <form id="login-form">
-            <input type="email" placeholder="Email">
-            <input type="password" placeholder="Password">
-            <button type="submit">LOGIN</button>
-            <p class="forgot-password">Forget Password?</p >
-            <p class="or">or</p >
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Password">
+            <button type="button" id="login-button">LOGIN</button>
+            <p class="forgot-password">Forgot Password?</p>
+            <p class="or">or</p>
             <div class="social-login">
-	<p align="center"><a href="https://weixin.qq.com/" > 微信登录</a>
-				<a href="https://im.qq.com/index/"> QQ登录</a>
-			</div></p> 
-		
+	            <p align="center">
+                    <a href="https://weixin.qq.com/">WeChat Login</a>
+				    <a href="https://im.qq.com/index/">QQ Login</a>
+			    </p>
+			</div>
+        </form>
+        
+        <!-- 注册表单 -->
+        <form id="signup-form">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+            <button type="button" id="signup-button">SIGN UP</button>
         </form>
     </div>
     <div class="right-section">
       <img src="images/cc54910e440a2e5c3bc6fcc9b17674a.jpg" width="900" height="700" alt=""/> </div>
 </div>
+
+<!-- ============================ -->
+<!--  SUPABASE 集成代码开始  -->
+<!-- ============================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// 重要：用实际信息替换这里！
+const supabaseUrl = 'https://nixlipqiyezzfvwqtdzj.supabase.co'  // 
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5peGxpcHFpeWV6emZ2d3F0ZHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMTIxODEsImV4cCI6MjA3NzU4ODE4MX0.rZvDmHfMkF5gZM2VWSQuS35LfWL2naJqScVY1Z8g0B4'  // ✅ 你的anon key
+
+// 初始化Supabase客户端
+const supabase = supabase.createClient(supabaseUrl, supabaseKey)
+
+// 选项卡切换功能
+document.addEventListener('DOMContentLoaded', function() {
+    const loginTab = document.getElementById('login-tab');
+    const signupTab = document.getElementById('signup-tab');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const loginButton = document.getElementById('login-button');
+    const signupButton = document.getElementById('signup-button');
+    
+    // 选项卡切换
+    loginTab.addEventListener('click', function() {
+        loginTab.classList.add('active');
+        signupTab.classList.remove('active');
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+    });
+    
+    signupTab.addEventListener('click', function() {
+        signupTab.classList.add('active');
+        loginTab.classList.remove('active');
+        signupForm.style.display = 'block';
+        loginForm.style.display = 'none';
+    });
+    
+    // 登录功能
+    loginButton.addEventListener('click', async function() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        if (!email || !password) {
+            alert('Please enter email and password');
+            return;
+        }
+        
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) {
+                alert('Login failed: ' + error.message);
+            } else {
+                alert('Login successful!');
+                // 跳转到账户页面
+                window.location.href = 'account.html';
+            }
+        } catch (error) {
+            alert('Login error: ' + error.message);
+        }
+    });
+    
+    // 注册功能
+    signupButton.addEventListener('click', async function() {
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        
+        if (!username || !email || !password || !confirmPassword) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+        
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters long');
+            return;
+        }
+        
+        try {
+            // 使用Supabase注册用户
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        username: username,
+                        full_name: username
+                    }
+                }
+            });
+            
+            if (error) {
+                alert('Registration failed: ' + error.message);
+            } else {
+                alert('Registration successful! Please check your email for verification.');
+                // 切换到登录选项卡
+                loginTab.click();
+                // 清空注册表单
+                document.getElementById('signup-form').reset();
+            }
+        } catch (error) {
+            alert('Registration error: ' + error.message);
+        }
+    });
+});
+</script>
 </body>
 </html>
