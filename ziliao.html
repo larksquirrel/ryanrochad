@@ -125,25 +125,34 @@ button:hover {
 }
 
 .nav-links a {
-    text-decoration: none;  /* 移除下划线 */
-    color: inherit;         /* 继承父元素颜色，而不是蓝色 */
+    text-decoration: none;
+    color: inherit;
 }
 
 .nav-links a:hover {
-    text-decoration: none;  /* 鼠标悬停时也移除下划线 */
-    color: inherit;         /* 保持颜色不变 */
+    text-decoration: none;
+    color: inherit;
 }
 
 .nav-links a:visited {
-    color: inherit;         /* 访问过的链接也保持相同颜色 */
+    color: inherit;
 }
 
 .nav-links a:active {
-    color: inherit;         /* 点击时保持颜色不变 */
+    color: inherit;
 }
 
 .nav-links li {
-    cursor: pointer;        /* 确保鼠标指针显示为手型 */
+    cursor: pointer;
+}
+
+.logout-btn {
+  background-color: #ff4444;
+  margin-left: 10px;
+}
+
+.logout-btn:hover {
+  background-color: #cc0000;
 }
 </style>
 
@@ -158,11 +167,15 @@ const client = createClient(
 
 // ✅ 加载用户信息
 async function loadProfile() {
+  console.log('开始加载用户信息...');
+
   try {
     const { data: { user }, error } = await client.auth.getUser();
 
+    console.log('获取用户结果:', { user: user ? user.email : '未登录', error });
+
     if (error || !user) {
-      // 没有用户登录时显示 NOT
+      console.log('用户未登录或获取失败');
       document.getElementById("display-username").textContent = "NOT";
       document.getElementById("display-email").textContent = "NOT";
       document.getElementById("welcome-text").textContent = "Welcome, Guest!";
@@ -176,10 +189,17 @@ async function loadProfile() {
         changePwdBtn.style.cursor = "not-allowed";
       }
 
+      // 隐藏登出按钮
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.style.display = 'none';
+      }
+
       return;
     }
 
     // 有用户登录时正常显示信息
+    console.log('用户已登录:', user.email);
     const username = user.user_metadata?.username || "User";
     const email = user.email || "Not provided";
 
@@ -187,30 +207,29 @@ async function loadProfile() {
     document.getElementById("display-email").textContent = email;
     document.getElementById("welcome-text").textContent = `Welcome, ${username}!`;
 
+    // 启用功能按钮
+    const changePwdBtn = document.querySelector('button[onclick="changePassword()"]');
+    if (changePwdBtn) {
+      changePwdBtn.disabled = false;
+      changePwdBtn.textContent = "Change your password";
+      changePwdBtn.style.backgroundColor = "";
+      changePwdBtn.style.cursor = "pointer";
+    }
+
+    // 显示登出按钮
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.style.display = 'inline-block';
+    }
+
+    console.log('用户信息显示完成');
+
   } catch (err) {
-    // 发生错误时也显示 NOT
     console.error("Error loading profile:", err);
     document.getElementById("display-username").textContent = "NOT";
     document.getElementById("display-email").textContent = "NOT";
     document.getElementById("welcome-text").textContent = "Welcome, Guest!";
   }
-}
-
-// ✅ 悬停显示密码
-function showPassword() {
-  const { data: { user } } = await client.auth.getUser();
-  if (!user) {
-    alert("Please login to view password");
-    return;
-  }
-
-  const storedPassword = localStorage.getItem("user_password");
-  const pwdEl = document.getElementById("password-text");
-  pwdEl.textContent = storedPassword || "(Cannot read password)";
-}
-
-function hidePassword() {
-  document.getElementById("password-text").textContent = "********";
 }
 
 // ✅ 修改密码
@@ -258,10 +277,26 @@ async function changePassword() {
   }
 }
 
-// ✅ 登录时保存密码（在登录页面调用）
-// 示例：localStorage.setItem("user_password", userPassword);
+// ✅ 登出功能
+async function logout() {
+  try {
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
 
-document.addEventListener("DOMContentLoaded", loadProfile);
+    // 清除本地存储的密码
+    localStorage.removeItem("user_password");
+
+    // 重新加载页面
+    window.location.reload();
+  } catch (err) {
+    alert("Logout error: " + err.message);
+  }
+}
+
+// 页面加载时初始化
+document.addEventListener("DOMContentLoaded", function() {
+  loadProfile();
+});
 </script>
 </head>
 
@@ -312,6 +347,7 @@ document.addEventListener("DOMContentLoaded", loadProfile);
         <span>Username: <span id="display-username">Loading...</span></span>
         <span>Email: <span id="display-email">Loading...</span></span>
         <button onclick="changePassword()">Change your password</button>
+        <button id="logout-btn" onclick="logout()" class="logout-btn" style="display: none;">Logout</button>
       </div>
 
       <div class="verification-status"></div>
