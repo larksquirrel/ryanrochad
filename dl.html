@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <title>Ryan Rochad</title>
 <style type="text/css">
-、
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -198,7 +197,64 @@ const client = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5peGxpcHFpeWV6emZ2d3F0ZHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMTIxODEsImV4cCI6MjA3NzU4ODE4MX0.rZvDmHfMkF5gZM2VWSQuS35LfWL2naJqScVY1Z8g0B4'
 );
 
+// 处理认证回调 - 新增函数
+async function handleAuthCallback() {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+    const type = hashParams.get('type');
+
+    console.log('检查认证参数:', { accessToken: !!accessToken, type, hash: window.location.hash });
+
+    if (accessToken && type === 'magiclink') {
+        try {
+            console.log('处理Magic Link登录...');
+
+            // 设置会话
+            const { data, error } = await client.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken
+            });
+
+            if (error) {
+                console.error('登录失败:', error);
+                alert('登录失败: ' + error.message);
+                return;
+            }
+
+            console.log('Magic Link登录成功!');
+
+            // 清除URL中的认证参数
+            window.location.hash = '';
+
+            // 跳转到目标页面
+            alert('Magic Link登录成功!');
+            window.location.href = 'ziliao.html';
+
+        } catch (err) {
+            console.error('处理登录时出错:', err);
+            alert('登录错误: ' + err.message);
+        }
+    }
+}
+
+// 检查登录状态 - 新增函数
+async function checkAuthStatus() {
+    const { data, error } = await client.auth.getUser();
+    if (data.user) {
+        console.log('用户已登录:', data.user.email);
+        // 可以在这里添加自动跳转逻辑
+        // window.location.href = 'ziliao.html';
+    } else {
+        console.log('用户未登录');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  // 页面加载时检查认证状态 - 新增
+  handleAuthCallback();
+  checkAuthStatus();
+
   const loginTab = document.getElementById('login-tab');
   const signupTab = document.getElementById('signup-tab');
   const loginForm = document.getElementById('login-form');
@@ -348,5 +404,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body>
-
 </html>
