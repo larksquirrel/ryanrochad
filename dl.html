@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>Ryan Rochad</title>
 <style type="text/css">
+  、
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -152,7 +153,7 @@ form button {
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-password" placeholder="Password">
       <button type="button" id="login-button">LOGIN</button>
-      <p class="forgot-password" id="forgot-password-link">Login with Magic Link</p>
+      <p class="forgot-password" id="forgot-password-link">Forgot Password?</p>
       <p class="or">or</p>
       <div class="social-login">
         <p align="center">
@@ -177,15 +178,22 @@ form button {
   </div>
 </div>
 
-<!-- Magic Link登录模态窗口 -->
+<!-- 忘记密码联系窗口 -->
 <div id="forgot-password-modal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
-    <h3 class="modal-title">Login with Magic Link</h3>
-    <p>Enter your email address and we'll send you a magic link to automatically sign in.</p>
-    <input type="email" id="reset-email" placeholder="Email" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;">
-    <button type="button" id="send-reset-link" style="width: 100%; padding: 10px; background-color: #6c5ce7; color: white; border: none; border-radius: 3px; cursor: pointer;">Send Magic Link</button>
-    <div id="reset-message" class="modal-message"></div>
+    <h3 class="modal-title">Forgot Password?</h3>
+    <p>If you have forgotten your password, please contact our support team for assistance.</p>
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+      <p style="margin: 0; font-weight: bold;">Contact Support:</p>
+      <p style="margin: 10px 0 0 0;">
+        <strong>Email:</strong> support@ryanrochad.com
+      </p>
+    </div>
+    <p style="font-size: 14px; color: #666;">
+      Our support team will help you reset your password and regain access to your account.
+    </p>
+    <button type="button" onclick="closeModal()" style="width: 100%; padding: 10px; background-color: #6c5ce7; color: white; border: none; border-radius: 3px; cursor: pointer;">Close</button>
   </div>
 </div>
 
@@ -197,7 +205,7 @@ const client = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5peGxpcHFpeWV6emZ2d3F0ZHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMTIxODEsImV4cCI6MjA3NzU4ODE4MX0.rZvDmHfMkF5gZM2VWSQuS35LfWL2naJqScVY1Z8g0B4'
 );
 
-// 处理认证回调 - 新增函数
+// 处理认证回调
 async function handleAuthCallback() {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
@@ -238,20 +246,23 @@ async function handleAuthCallback() {
     }
 }
 
-// 检查登录状态 - 新增函数
+// 检查登录状态
 async function checkAuthStatus() {
     const { data, error } = await client.auth.getUser();
     if (data.user) {
         console.log('用户已登录:', data.user.email);
-        // 可以在这里添加自动跳转逻辑
-        // window.location.href = 'ziliao.html';
     } else {
         console.log('用户未登录');
     }
 }
 
+// 关闭模态窗口函数
+function closeModal() {
+    document.getElementById('forgot-password-modal').style.display = 'none';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-  // 页面加载时检查认证状态 - 新增
+  // 页面加载时检查认证状态
   handleAuthCallback();
   checkAuthStatus();
 
@@ -263,9 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const signupButton = document.getElementById('signup-button');
   const forgotPasswordLink = document.getElementById('forgot-password-link');
   const forgotPasswordModal = document.getElementById('forgot-password-modal');
-  const closeModal = document.querySelector('.close');
-  const sendResetLinkButton = document.getElementById('send-reset-link');
-  const resetMessage = document.getElementById('reset-message');
+  const closeModalBtn = document.querySelector('.close');
 
   // 切换选项卡
   loginTab.addEventListener('click', function() {
@@ -282,15 +291,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loginForm.style.display = 'none';
   });
 
-  // 打开Magic Link登录模态窗口
+  // 打开忘记密码联系窗口
   forgotPasswordLink.addEventListener('click', function() {
     forgotPasswordModal.style.display = 'block';
-    resetMessage.style.display = 'none';
-    document.getElementById('reset-email').value = '';
   });
 
   // 关闭模态窗口
-  closeModal.addEventListener('click', function() {
+  closeModalBtn.addEventListener('click', function() {
     forgotPasswordModal.style.display = 'none';
   });
 
@@ -301,38 +308,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // 发送Magic Link登录链接
-  sendResetLinkButton.addEventListener('click', async function() {
-    const email = document.getElementById('reset-email').value.trim();
-    if (!email) {
-      showMessage('Please enter your email address', 'error');
-      return;
-    }
-    try {
-      const redirectUrl = 'http://www.ryanrochad.com/';
-      console.log('Magic Link Redirect URL: ', redirectUrl);
-
-      // 使用 signInWithOtp 发送Magic Link登录链接
-      const { data, error } = await client.auth.signInWithOtp({
-        email: email,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
-      });
-
-      if (error) {
-        showMessage('Error: ' + error.message, 'error');
-      } else {
-        showMessage('Magic link sent! Check your email for the automatic login link.', 'success');
-        setTimeout(() => { forgotPasswordModal.style.display = 'none'; }, 3000);
-      }
-    } catch (err) {
-      showMessage('Error: ' + err.message, 'error');
-    }
-  });
-
   // 显示消息函数
   function showMessage(message, type) {
+    const resetMessage = document.getElementById('reset-message');
     resetMessage.textContent = message;
     resetMessage.className = 'modal-message ' + type;
     resetMessage.style.display = 'block';
@@ -404,4 +382,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body>
+
 </html>

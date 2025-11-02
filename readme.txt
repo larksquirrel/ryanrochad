@@ -1,4 +1,4 @@
-最新版本：瑞恩罗恰德2.0.zip
+最新版本：瑞恩罗恰德3.0.zip
 
 2025/08/19
 1. 更新代码及github链接：
@@ -23,21 +23,26 @@
        自主3D建模
 
 2025/11/01
-1. 更新代码：
-    a. 增加dl.html的切换及注册sign up功能界面
+1. 更新代码及github链接：
+    a. 增加dl.html的切换及【注册sign up功能】界面
     b. 将ziliao.html加入主体，分栏名为Account，登录后的跳转界面
 2. 建立Supabase数据库
     a. github账户，密码：01231003heihua
+    b. 配置，Authentication——URL Configuration——Site URL：http://www.ryanrochad.com；Redirect URLs：http://www.ryanrochad.com/，http://localhost:3000/
 3. 暂时不能实现的：
     a. QQ和微信的登录，需要备案
 
 2025/11/02
-1. 更新代码：
-    a. ziliao.html增加动态显示用户信息功能及更改密码功能
-    b. ziliao.html删除了显示密码功能（Supabase隐私保护不允许）
-    c. ziliao.html更改了分栏跳转内容，并增加删除链接蓝色下划线的style样式
-    d. 统一大小写等样式问题
+1. 更新代码及github链接：
+    a. ziliao.html增加【动态显示用户信息功能】
+    b. ziliao.html增加了【更改密码功能】
+    c. ziliao.html删除了显示密码功能（Supabase隐私保护不允许）
+    d. ziliao.html更改了分栏跳转内容，并增加删除链接蓝色下划线的style样式
+    e. dl.html增加了“Forget password？”的解决方案：联系工作人员手动解决
+        !!!使用Supabase的resent password不跳转Supabase，不能实现
+    f. 统一样式问题：分栏内容，页面title，按钮颜色等
 2. Supabase数据库配置
-    a. 更改注册Email内容为RR专属内容（由其他同事提供文案）
+    a. 更改注册Email内容为RR指定内容（由其他同事提供文案）：Authentication——Emails——Confirm sign up
+
 
 
