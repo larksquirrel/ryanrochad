@@ -158,32 +158,70 @@ const client = createClient(
 
 // ✅ 加载用户信息
 async function loadProfile() {
-  const { data: { user } } = await client.auth.getUser();
-  if (user) {
+  try {
+    const { data: { user }, error } = await client.auth.getUser();
+
+    if (error || !user) {
+      // 没有用户登录时显示 NOT
+      document.getElementById("display-username").textContent = "NOT";
+      document.getElementById("display-email").textContent = "NOT";
+      document.getElementById("welcome-text").textContent = "Welcome, Guest!";
+
+      // 禁用需要登录的功能
+      const changePwdBtn = document.querySelector('button[onclick="changePassword()"]');
+      if (changePwdBtn) {
+        changePwdBtn.disabled = true;
+        changePwdBtn.textContent = "Please login to change password";
+        changePwdBtn.style.backgroundColor = "#ccc";
+        changePwdBtn.style.cursor = "not-allowed";
+      }
+
+      return;
+    }
+
+    // 有用户登录时正常显示信息
     const username = user.user_metadata?.username || "User";
     const email = user.email || "Not provided";
 
     document.getElementById("display-username").textContent = username;
     document.getElementById("display-email").textContent = email;
     document.getElementById("welcome-text").textContent = `Welcome, ${username}!`;
-  } else {
-    alert("No user logged in. Redirecting...");
-    window.location.href = "login.html";
+
+  } catch (err) {
+    // 发生错误时也显示 NOT
+    console.error("Error loading profile:", err);
+    document.getElementById("display-username").textContent = "NOT";
+    document.getElementById("display-email").textContent = "NOT";
+    document.getElementById("welcome-text").textContent = "Welcome, Guest!";
   }
 }
 
 // ✅ 悬停显示密码
 function showPassword() {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) {
+    alert("Please login to view password");
+    return;
+  }
+
   const storedPassword = localStorage.getItem("user_password");
   const pwdEl = document.getElementById("password-text");
   pwdEl.textContent = storedPassword || "(Cannot read password)";
 }
+
 function hidePassword() {
   document.getElementById("password-text").textContent = "********";
 }
 
 // ✅ 修改密码
 async function changePassword() {
+  // 检查用户是否登录
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) {
+    alert("Please login to change password");
+    return;
+  }
+
   const current = prompt("Enter your current password:");
   const newPass = prompt("Enter your new password:");
   const confirm = prompt("Confirm your new password:");
@@ -200,7 +238,7 @@ async function changePassword() {
   try {
     // 先登录验证旧密码
     const { data: login, error: loginErr } = await client.auth.signInWithPassword({
-      email: document.getElementById("display-email").textContent,
+      email: user.email,
       password: current
     });
     if (loginErr) {
@@ -232,12 +270,12 @@ document.addEventListener("DOMContentLoaded", loadProfile);
   <nav>
     <div class="logo">Ryan Rochad's</div>
     <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="zhuye.html">About Us</a></li>
-                <li>Services</li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="dl.html">Login</a></li>
-                <li>Account</li>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="zhuye.html">About Us</a></li>
+      <li>Services</li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="dl.html">Login</a></li>
+      <li>Account</li>
     </ul>
     <div class="search-bar">
       <input type="text" placeholder="搜索瑞恩罗恰德">
@@ -271,8 +309,8 @@ document.addEventListener("DOMContentLoaded", loadProfile);
     <div class="main-content">
       <h2>Account information</h2>
       <div class="info-row">
-        <span id="display-username">Loading...</span>
-        <span id="display-email">Loading...</span>
+        <span>Username: <span id="display-username">Loading...</span></span>
+        <span>Email: <span id="display-email">Loading...</span></span>
         <button onclick="changePassword()">Change your password</button>
       </div>
 
@@ -283,6 +321,7 @@ document.addEventListener("DOMContentLoaded", loadProfile);
 
   <section class="preferences-section">
     <h2>Account and auction preferences</h2>
+    <p>Please login to view and manage your preferences</p>
   </section>
 </main>
 

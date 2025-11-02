@@ -153,7 +153,7 @@ form button {
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-password" placeholder="Password">
       <button type="button" id="login-button">LOGIN</button>
-      <p class="forgot-password" id="forgot-password-link">Forgot Password?</p>
+      <p class="forgot-password" id="forgot-password-link">Login with Magic Link</p>
       <p class="or">or</p>
       <div class="social-login">
         <p align="center">
@@ -178,14 +178,14 @@ form button {
   </div>
 </div>
 
-<!-- 忘记密码模态窗口 -->
+<!-- Magic Link登录模态窗口 -->
 <div id="forgot-password-modal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
-    <h3 class="modal-title">Reset Your Password</h3>
-    <p>Enter your email address and we'll send you a verification link to reset your password.</p>
+    <h3 class="modal-title">Login with Magic Link</h3>
+    <p>Enter your email address and we'll send you a magic link to automatically sign in.</p>
     <input type="email" id="reset-email" placeholder="Email" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;">
-    <button type="button" id="send-reset-link" style="width: 100%; padding: 10px; background-color: #6c5ce7; color: white; border: none; border-radius: 3px; cursor: pointer;">Send Verification Link</button>
+    <button type="button" id="send-reset-link" style="width: 100%; padding: 10px; background-color: #6c5ce7; color: white; border: none; border-radius: 3px; cursor: pointer;">Send Magic Link</button>
     <div id="reset-message" class="modal-message"></div>
   </div>
 </div>
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loginForm.style.display = 'none';
   });
 
-  // 打开忘记密码模态窗口
+  // 打开Magic Link登录模态窗口
   forgotPasswordLink.addEventListener('click', function() {
     forgotPasswordModal.style.display = 'block';
     resetMessage.style.display = 'none';
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // 【修正核心】发送密码重置链接
+  // 发送Magic Link登录链接
   sendResetLinkButton.addEventListener('click', async function() {
     const email = document.getElementById('reset-email').value.trim();
     if (!email) {
@@ -253,18 +253,21 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     try {
-      // 关键改动：使用明确的、无空格的重定向URL
-      const redirectUrl = 'http://www.ryanrochad.com/'; // 确保与Supabase配置完全一致
-      console.log('Reset Password Redirect URL: ', redirectUrl); // 调试用
+      const redirectUrl = 'http://www.ryanrochad.com/';
+      console.log('Magic Link Redirect URL: ', redirectUrl);
 
-      const { data, error } = await client.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl
+      // 使用 signInWithOtp 发送Magic Link登录链接
+      const { data, error } = await client.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: redirectUrl
+        }
       });
 
       if (error) {
         showMessage('Error: ' + error.message, 'error');
       } else {
-        showMessage('Password reset link has been sent! Please check your email.', 'success');
+        showMessage('Magic link sent! Check your email for the automatic login link.', 'success');
         setTimeout(() => { forgotPasswordModal.style.display = 'none'; }, 3000);
       }
     } catch (err) {
@@ -279,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
     resetMessage.style.display = 'block';
   }
 
-  // 【修正】注册功能
+  // 注册功能
   signupButton.addEventListener('click', async function() {
     const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -295,16 +298,15 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     try {
-      // 关键改动：注册也使用明确的、无空格的重定向URL
       const redirectUrl = 'http://www.ryanrochad.com/';
-      console.log('Signup Redirect URL: ', redirectUrl); // 调试用
+      console.log('Signup Redirect URL: ', redirectUrl);
 
       const { data, error } = await client.auth.signUp({
         email,
         password,
         options: {
           data: { username },
-          emailRedirectTo: redirectUrl // 确保这里也配置了
+          emailRedirectTo: redirectUrl
         }
       });
 
@@ -346,4 +348,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body>
+
 </html>
