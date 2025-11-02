@@ -2,17 +2,15 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Ryan Rochadd</title>
-
+<title>Ryan Rochad</title>
 <style type="text/css">
-  、
+、
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
 }
-
 .container {
   display: flex;
   justify-content: space-between;
@@ -20,7 +18,6 @@ body {
   min-height: 100vh;
   padding: 0 50px;
 }
-
 .left-section {
   background-color: white;
   padding: 30px;
@@ -28,29 +25,24 @@ body {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   width: 400px;
 }
-
 .logo img {
   width: 150px;
 }
-
 .tabs {
   display: flex;
   list-style-type: none;
   margin: 20px 0;
   padding: 0;
 }
-
 .tabs li {
   padding: 10px 20px;
   cursor: pointer;
   border-bottom: 2px solid transparent;
 }
-
 .tabs li.active {
   border-bottom: 2px solid #6c5ce7;
   color: #6c5ce7;
 }
-
 form input {
   width: 100%;
   padding: 10px;
@@ -59,7 +51,6 @@ form input {
   border-radius: 3px;
   box-sizing: border-box;
 }
-
 form button {
   width: 100%;
   padding: 10px;
@@ -69,35 +60,79 @@ form button {
   border-radius: 3px;
   cursor: pointer;
 }
-
 .forgot-password {
   text-align: center;
   margin-top: 10px;
   color: #6c5ce7;
   cursor: pointer;
 }
-
 .or {
   text-align: center;
   margin: 10px 0;
 }
-
 .social-login a {
   margin: 0 5px;
 }
-
 .right-section {
   flex: 1;
   text-align: center;
 }
-
 .right-section img {
   max-width: 100%;
   height: auto;
 }
-
 #signup-form {
   display: none;
+}
+/* 忘记密码模态窗口样式 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 5px;
+  width: 400px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.close:hover {
+  color: black;
+}
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #6c5ce7;
+}
+.modal-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 3px;
+  display: none;
+}
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 </style>
 </head>
@@ -118,7 +153,7 @@ form button {
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-password" placeholder="Password">
       <button type="button" id="login-button">LOGIN</button>
-      <p class="forgot-password">Forgot Password?</p>
+      <p class="forgot-password" id="forgot-password-link">Forgot Password?</p>
       <p class="or">or</p>
       <div class="social-login">
         <p align="center">
@@ -143,9 +178,18 @@ form button {
   </div>
 </div>
 
-<!-- ============================ -->
-<!-- 🔥 SUPABASE 集成代码开始 🔥 -->
-<!-- ============================ -->
+<!-- 忘记密码模态窗口 -->
+<div id="forgot-password-modal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3 class="modal-title">Reset Your Password</h3>
+    <p>Enter your email address and we'll send you a verification link to reset your password.</p>
+    <input type="email" id="reset-email" placeholder="Email" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;">
+    <button type="button" id="send-reset-link" style="width: 100%; padding: 10px; background-color: #6c5ce7; color: white; border: none; border-radius: 3px; cursor: pointer;">Send Verification Link</button>
+    <div id="reset-message" class="modal-message"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const { createClient } = supabase;
@@ -161,6 +205,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const signupForm = document.getElementById('signup-form');
   const loginButton = document.getElementById('login-button');
   const signupButton = document.getElementById('signup-button');
+  const forgotPasswordLink = document.getElementById('forgot-password-link');
+  const forgotPasswordModal = document.getElementById('forgot-password-modal');
+  const closeModal = document.querySelector('.close');
+  const sendResetLinkButton = document.getElementById('send-reset-link');
+  const resetMessage = document.getElementById('reset-message');
 
   // 切换选项卡
   loginTab.addEventListener('click', function() {
@@ -177,7 +226,60 @@ document.addEventListener('DOMContentLoaded', function() {
     loginForm.style.display = 'none';
   });
 
-  // 注册功能
+  // 打开忘记密码模态窗口
+  forgotPasswordLink.addEventListener('click', function() {
+    forgotPasswordModal.style.display = 'block';
+    resetMessage.style.display = 'none';
+    document.getElementById('reset-email').value = '';
+  });
+
+  // 关闭模态窗口
+  closeModal.addEventListener('click', function() {
+    forgotPasswordModal.style.display = 'none';
+  });
+
+  // 点击模态窗口外部关闭
+  window.addEventListener('click', function(event) {
+    if (event.target === forgotPasswordModal) {
+      forgotPasswordModal.style.display = 'none';
+    }
+  });
+
+  // 【修正核心】发送密码重置链接
+  sendResetLinkButton.addEventListener('click', async function() {
+    const email = document.getElementById('reset-email').value.trim();
+    if (!email) {
+      showMessage('Please enter your email address', 'error');
+      return;
+    }
+    try {
+      // 关键改动：使用明确的、无空格的重定向URL
+      const redirectUrl = 'http://www.ryanrochad.com/'; // 确保与Supabase配置完全一致
+      console.log('Reset Password Redirect URL: ', redirectUrl); // 调试用
+
+      const { data, error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+      });
+
+      if (error) {
+        showMessage('Error: ' + error.message, 'error');
+      } else {
+        showMessage('Password reset link has been sent! Please check your email.', 'success');
+        setTimeout(() => { forgotPasswordModal.style.display = 'none'; }, 3000);
+      }
+    } catch (err) {
+      showMessage('Error: ' + err.message, 'error');
+    }
+  });
+
+  // 显示消息函数
+  function showMessage(message, type) {
+    resetMessage.textContent = message;
+    resetMessage.className = 'modal-message ' + type;
+    resetMessage.style.display = 'block';
+  }
+
+  // 【修正】注册功能
   signupButton.addEventListener('click', async function() {
     const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -188,24 +290,28 @@ document.addEventListener('DOMContentLoaded', function() {
       alert('Please fill in all fields');
       return;
     }
-
     if (password !== confirmPassword) {
       alert('Passwords do not match');
       return;
     }
-
     try {
+      // 关键改动：注册也使用明确的、无空格的重定向URL
+      const redirectUrl = 'http://www.ryanrochad.com/';
+      console.log('Signup Redirect URL: ', redirectUrl); // 调试用
+
       const { data, error } = await client.auth.signUp({
         email,
         password,
-        options: { data: { username } }
+        options: {
+          data: { username },
+          emailRedirectTo: redirectUrl // 确保这里也配置了
+        }
       });
 
       if (error) {
         alert('Registration failed: ' + error.message);
       } else {
-        alert('Registration successful! Please verify your email.');
-        // 切换回登录界面
+        alert('Registration successful! Please check your email and click the verification link.');
         loginTab.click();
         signupForm.reset();
       }
@@ -218,23 +324,20 @@ document.addEventListener('DOMContentLoaded', function() {
   loginButton.addEventListener('click', async function() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-
     if (!email || !password) {
       alert('Please enter email and password');
       return;
     }
-
     try {
       const { data, error } = await client.auth.signInWithPassword({
         email,
         password
       });
-
       if (error) {
         alert('Login failed: ' + error.message);
       } else {
         alert('Login successful!');
-        window.location.href = 'zhuye.html';
+        window.location.href = 'ziliao.html';
       }
     } catch (err) {
       alert('Login error: ' + err.message);
@@ -242,9 +345,5 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-<!-- ============================ -->
-<!-- 🔥 SUPABASE 集成代码结束 🔥 -->
-<!-- ============================ -->
-
 </body>
 </html>

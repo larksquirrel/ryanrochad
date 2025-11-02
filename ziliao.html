@@ -2,260 +2,289 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>无标题文档</title>
+<title>Ryan Rochad</title>
+
 <style type="text/css">
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
+  padding-bottom: 40px;
+  background-color: #f4f4f4;
 }
-
 header {
   background-color: #f8f8f8;
   padding: 15px;
 }
-
 nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
-.logo a {
+.logo {
   font-size: 28px;
-  text-decoration: none;
   color: #000;
 }
-
 .nav-links {
   display: flex;
   list-style: none;
 }
-
 .nav-links li {
   margin-left: 30px;
 }
-
-.nav-links li a {
-  text-decoration: none;
-  color: #333;
-}
-
 .search-bar {
   display: flex;
   align-items: center;
 }
-
 .search-bar input {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 3px;
   width: 300px;
 }
-
 .search-bar button {
   background-color: transparent;
   border: none;
   cursor: pointer;
 }
-
 .user-actions {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
-
-.user-actions a {
-  margin-left: 15px;
-  text-decoration: none;
-}
-
-.account-dropdown {
-  position: relative;
-}
-
-.account-dropdown ul {
-  display: none;
-  position: absolute;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  padding: 10px;
-  top: 100%;
-  right: 0;
-}
-
-.account-dropdown:hover ul {
-  display: block;
-}
-
-.account-dropdown ul li {
-  margin-bottom: 5px;
-}
-
-.account-dropdown ul li a {
-  color: #333;
-}
-
 .account-section {
   background-color: #f4f4f4;
   padding: 30px;
   text-align: center;
 }
-
-.account-section h1 {
-  margin-bottom: 15px;
-}
-
-.account-section p {
-  margin-bottom: 20px;
-}
-
 .welcome-message {
   text-align: right;
 }
-
 .account-details {
   display: flex;
   padding: 30px;
+  gap: 20px;
 }
-
 .sidebar {
   width: 200px;
   background-color: #f4f4f4;
 }
-
 .sidebar ul {
   list-style: none;
 }
-
 .sidebar ul li {
   padding: 10px;
 }
-
-.sidebar ul li a {
-  text-decoration: none;
-  color: #777;
-}
-
 .main-content {
   flex: 1;
   background-color: #fff;
   padding: 20px;
+  border-radius: 8px;
 }
-
 .info-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 15px;
+  gap: 10px;
 }
-
-.verification-status {
-  color: #f00;
-  margin-bottom: 20px;
+.info-row span {
+  min-width: 160px;
+  display: inline-block;
 }
-
-.complete-profile {
+.password-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.password-text {
+  font-size: 16px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  user-select: none;
+}
+button {
   background-color: #004080;
   color: #fff;
   border: none;
   padding: 10px 20px;
   cursor: pointer;
+  border-radius: 4px;
 }
-
+button:hover {
+  background-color: #003366;
+}
 .preferences-section {
   background-color: #f4f4f4;
   padding: 30px;
+  margin-top: 20px;
 }
-	</style>
+
+.nav-links a {
+    text-decoration: none;  /* 移除下划线 */
+    color: inherit;         /* 继承父元素颜色，而不是蓝色 */
+}
+
+.nav-links a:hover {
+    text-decoration: none;  /* 鼠标悬停时也移除下划线 */
+    color: inherit;         /* 保持颜色不变 */
+}
+
+.nav-links a:visited {
+    color: inherit;         /* 访问过的链接也保持相同颜色 */
+}
+
+.nav-links a:active {
+    color: inherit;         /* 点击时保持颜色不变 */
+}
+
+.nav-links li {
+    cursor: pointer;        /* 确保鼠标指针显示为手型 */
+}
+</style>
+
+<!-- ✅ 引入 Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const { createClient } = supabase;
+const client = createClient(
+  'https://nixlipqiyezzfvwqtdzj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5peGxpcHFpeWV6emZ2d3F0ZHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMTIxODEsImV4cCI6MjA3NzU4ODE4MX0.rZvDmHfMkF5gZM2VWSQuS35LfWL2naJqScVY1Z8g0B4'
+);
+
+// ✅ 加载用户信息
+async function loadProfile() {
+  const { data: { user } } = await client.auth.getUser();
+  if (user) {
+    const username = user.user_metadata?.username || "User";
+    const email = user.email || "Not provided";
+
+    document.getElementById("display-username").textContent = username;
+    document.getElementById("display-email").textContent = email;
+    document.getElementById("welcome-text").textContent = `Welcome, ${username}!`;
+  } else {
+    alert("No user logged in. Redirecting...");
+    window.location.href = "login.html";
+  }
+}
+
+// ✅ 悬停显示密码
+function showPassword() {
+  const storedPassword = localStorage.getItem("user_password");
+  const pwdEl = document.getElementById("password-text");
+  pwdEl.textContent = storedPassword || "(Cannot read password)";
+}
+function hidePassword() {
+  document.getElementById("password-text").textContent = "********";
+}
+
+// ✅ 修改密码
+async function changePassword() {
+  const current = prompt("Enter your current password:");
+  const newPass = prompt("Enter your new password:");
+  const confirm = prompt("Confirm your new password:");
+
+  if (!current || !newPass || !confirm) {
+    alert("Password fields cannot be empty.");
+    return;
+  }
+  if (newPass !== confirm) {
+    alert("New passwords do not match.");
+    return;
+  }
+
+  try {
+    // 先登录验证旧密码
+    const { data: login, error: loginErr } = await client.auth.signInWithPassword({
+      email: document.getElementById("display-email").textContent,
+      password: current
+    });
+    if (loginErr) {
+      alert("Current password is incorrect.");
+      return;
+    }
+
+    // 更新密码
+    const { error } = await client.auth.updateUser({ password: newPass });
+    if (error) throw error;
+
+    // 更新本地缓存
+    localStorage.setItem("user_password", newPass);
+    alert("Password updated successfully!");
+  } catch (err) {
+    alert("Error updating password: " + err.message);
+  }
+}
+
+// ✅ 登录时保存密码（在登录页面调用）
+// 示例：localStorage.setItem("user_password", userPassword);
+
+document.addEventListener("DOMContentLoaded", loadProfile);
+</script>
 </head>
 
 <body>
 <header>
-    <nav>
-      <div class="logo">
-        Ryan Rochad's
-      </div>
-      <ul class="nav-links">
-        <li>Buy&nbsp;</li>
-        <li>Now&nbsp;</li>
-        <li>Sell&nbsp;</li>
-        <li>Browse&nbsp;</li>
-        <li>Service&nbsp;</li>
+  <nav>
+    <div class="logo">Ryan Rochad's</div>
+    <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="zhuye.html">About Us</a></li>
+                <li>Services</li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="dl.html">Login</a></li>
+                <li>Account</li>
+    </ul>
+    <div class="search-bar">
+      <input type="text" placeholder="搜索瑞恩罗恰德">
+      <button type="submit">
+        <img src="images/3cf56231255d641f25bad5ba1f3f80c.jpg" alt="搜索图标" width="16" height="16">
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="account-section">
+    <h1>Account information</h1>
+    <p>If you have any problems with your account, please contact customer service</p>
+    <div class="welcome-message">
+      <p id="welcome-text">Welcome</p>
+    </div>
+  </section>
+
+  <section class="account-details">
+    <div class="sidebar">
+      <ul>
+        <li>Account information</li>
+        <li>Auction</li>
+        <li>Information</li>
+        <li>Purchase history</li>
+        <li>Seller Central</li>
       </ul>
-      <div class="search-bar">
-        <input type="text" placeholder="搜索瑞恩罗恰德">
-        <button type="submit"><img src="images/3cf56231255d641f25bad5ba1f3f80c.jpg"  alt="搜索图标" width="16" height="16"></button> 
-      </div>
-      <div class="user-actions">
-        <img src="images/6383d362206715e46663f1e78418cdf.jpg" alt="收藏图标" width="16" height="16"> 
-        <img src="images/15f2c0f7f16fbc07c6bf78638f6988b.jpg" alt="购物车图标" width="16" height="16"> 
-        <div class="account-dropdown">
-          My Account
-          <ul class="dropdown-menu">
-            <li>登出</li>
-            <li>简介</li>
-            <li>語言</li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
+    </div>
 
-  <main>
-    <section class="account-section">
-      <h1>Account information</h1>
-      <p>If you have any problems with your account, please contact customer service</p >
-      <div class="welcome-message">
-        <p>Welcome Mr.Xie</p >
-        <p>xieyuchen@RyanRochad.com</p >
+    <div class="main-content">
+      <h2>Account information</h2>
+      <div class="info-row">
+        <span id="display-username">Loading...</span>
+        <span id="display-email">Loading...</span>
+        <button onclick="changePassword()">Change your password</button>
       </div>
-    </section>
 
-    <section class="account-details">
-      <div class="sidebar">
-        <ul>
-          <li>Account information</li>
-          <li>Auction</li>
-          <li>Information</li>
-          <li>Purchase history</li>
-          <li>Seller Central</li>
-        </ul>
-      </div>
-      <div class="main-content">
-        <h2>Account information</h2>
-        <div class="info-row">
-          <span>Yuchen Xie</span>
-          <span>xieyuchen@RyanRochad.com</span>
-          <span>password</span>
-       Change your password
-        </div>
-		    <div class="info-row">
-        
-				  <span> </span>
-          <span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Not certified!</span>
-          <span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;********</span>
-       &nbsp; &nbsp; &nbsp; &nbsp; Change your password</div>
-        <div class="verification-status">
-        
-        </div>
-        
-      
-		  
-		  <p><button class="complete-profile">Complete filling in your account information</button></p> 
-      </div>
-    </section>
+      <div class="verification-status"></div>
+      <p><button class="complete-profile">Complete filling in your account information</button></p>
+    </div>
+  </section>
 
-    <section class="preferences-section">
-      <h2>Account and auction preferences</h2>
-    
-    </section>
-  </main>
+  <section class="preferences-section">
+    <h2>Account and auction preferences</h2>
+  </section>
+</main>
+
 </body>
-
 </html>
-
