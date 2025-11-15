@@ -153,7 +153,12 @@ form button {
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-password" placeholder="Password">
       <button type="button" id="login-button">LOGIN</button>
-      <p class="forgot-password" id="forgot-password-link">Forgot Password?</p>
+
+      <!-- 找回密码按钮 -->
+      <p class="forgot-password" id="forgot-password-link" style="cursor:pointer;">
+        Forgot Password?
+      </p>
+
       <p class="or">or</p>
       <div class="social-login">
         <p align="center">
@@ -164,7 +169,7 @@ form button {
     </form>
 
     <!-- 注册表单 -->
-    <form id="signup-form">
+    <form id="signup-form" style="display:none;">
       <input type="text" id="username" placeholder="Username" required>
       <input type="email" id="email" placeholder="Email" required>
       <input type="password" id="password" placeholder="Password" required>
@@ -178,25 +183,6 @@ form button {
   </div>
 </div>
 
-<!-- 忘记密码联系窗口 -->
-<div id="forgot-password-modal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h3 class="modal-title">Forgot Password?</h3>
-    <p>If you have forgotten your password, please contact our support team for assistance.</p>
-    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
-      <p style="margin: 0; font-weight: bold;">Contact Support:</p>
-      <p style="margin: 10px 0 0 0;">
-        <strong>Email:</strong> support@ryanrochad.com
-      </p>
-    </div>
-    <p style="font-size: 14px; color: #666;">
-      Our support team will help you reset your password and regain access to your account.
-    </p>
-    <button type="button" onclick="closeModal()" style="width: 100%; padding: 10px; background-color: #6c5ce7; color: white; border: none; border-radius: 3px; cursor: pointer;">Close</button>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const { createClient } = supabase;
@@ -205,66 +191,25 @@ const client = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5peGxpcHFpeWV6emZ2d3F0ZHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMTIxODEsImV4cCI6MjA3NzU4ODE4MX0.rZvDmHfMkF5gZM2VWSQuS35LfWL2naJqScVY1Z8g0B4'
 );
 
-// 处理认证回调
+// 处理认证回调（Magic Link）
 async function handleAuthCallback() {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
     const refreshToken = hashParams.get('refresh_token');
     const type = hashParams.get('type');
 
-    console.log('检查认证参数:', { accessToken: !!accessToken, type, hash: window.location.hash });
-
     if (accessToken && type === 'magiclink') {
-        try {
-            console.log('处理Magic Link登录...');
+        const { data, error } = await client.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+        });
 
-            // 设置会话
-            const { data, error } = await client.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken
-            });
-
-            if (error) {
-                console.error('登录失败:', error);
-                alert('登录失败: ' + error.message);
-                return;
-            }
-
-            console.log('Magic Link登录成功!');
-
-            // 清除URL中的认证参数
-            window.location.hash = '';
-
-            // 跳转到目标页面
-            alert('Magic Link登录成功!');
-            window.location.href = 'ziliao.html';
-
-        } catch (err) {
-            console.error('处理登录时出错:', err);
-            alert('登录错误: ' + err.message);
-        }
+        if (!error) window.location.href = 'ziliao.html';
     }
-}
-
-// 检查登录状态
-async function checkAuthStatus() {
-    const { data, error } = await client.auth.getUser();
-    if (data.user) {
-        console.log('用户已登录:', data.user.email);
-    } else {
-        console.log('用户未登录');
-    }
-}
-
-// 关闭模态窗口函数
-function closeModal() {
-    document.getElementById('forgot-password-modal').style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // 页面加载时检查认证状态
   handleAuthCallback();
-  checkAuthStatus();
 
   const loginTab = document.getElementById('login-tab');
   const signupTab = document.getElementById('signup-tab');
@@ -273,10 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const loginButton = document.getElementById('login-button');
   const signupButton = document.getElementById('signup-button');
   const forgotPasswordLink = document.getElementById('forgot-password-link');
-  const forgotPasswordModal = document.getElementById('forgot-password-modal');
-  const closeModalBtn = document.querySelector('.close');
 
-  // 切换选项卡
+  /* 切换 tab */
   loginTab.addEventListener('click', function() {
     loginTab.classList.add('active');
     signupTab.classList.remove('active');
@@ -291,96 +234,57 @@ document.addEventListener('DOMContentLoaded', function() {
     loginForm.style.display = 'none';
   });
 
-  // 打开忘记密码联系窗口
-  forgotPasswordLink.addEventListener('click', function() {
-    forgotPasswordModal.style.display = 'block';
-  });
-
-  // 关闭模态窗口
-  closeModalBtn.addEventListener('click', function() {
-    forgotPasswordModal.style.display = 'none';
-  });
-
-  // 点击模态窗口外部关闭
-  window.addEventListener('click', function(event) {
-    if (event.target === forgotPasswordModal) {
-      forgotPasswordModal.style.display = 'none';
-    }
-  });
-
-  // 显示消息函数
-  function showMessage(message, type) {
-    const resetMessage = document.getElementById('reset-message');
-    resetMessage.textContent = message;
-    resetMessage.className = 'modal-message ' + type;
-    resetMessage.style.display = 'block';
-  }
-
-  // 注册功能
+  /* 注册功能 */
   signupButton.addEventListener('click', async function() {
     const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
 
-    if (!username || !email || !password || !confirmPassword) {
-      alert('Please fill in all fields');
-      return;
-    }
     if (password !== confirmPassword) {
       alert('Passwords do not match');
       return;
     }
-    try {
-      const redirectUrl = 'http://www.ryanrochad.com/';
-      console.log('Signup Redirect URL: ', redirectUrl);
 
-      const { data, error } = await client.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { username },
-          emailRedirectTo: redirectUrl
-        }
-      });
-
-      if (error) {
-        alert('Registration failed: ' + error.message);
-      } else {
-        alert('Registration successful! Please check your email and click the verification link.');
-        loginTab.click();
-        signupForm.reset();
+    const { error } = await client.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { username },
+        emailRedirectTo: 'http://www.ryanrochad.com/'
       }
-    } catch (err) {
-      alert('Registration error: ' + err.message);
-    }
+    });
+
+    if (error) alert(error.message);
+    else alert("Registration successful! Please check your email.");
   });
 
-  // 登录功能
+  /* 登录功能 */
   loginButton.addEventListener('click', async function() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    if (!email || !password) {
-      alert('Please enter email and password');
-      return;
-    }
-    try {
-      const { data, error } = await client.auth.signInWithPassword({
-        email,
-        password
-      });
-      if (error) {
-        alert('Login failed: ' + error.message);
-      } else {
-        alert('Login successful!');
-        window.location.href = 'ziliao.html';
-      }
-    } catch (err) {
-      alert('Login error: ' + err.message);
-    }
+
+    const { error } = await client.auth.signInWithPassword({ email, password });
+
+    if (error) alert('Login failed: ' + error.message);
+    else window.location.href = 'ziliao.html';
+  });
+
+  /* 找回密码功能（全新） */
+  forgotPasswordLink.addEventListener('click', async function() {
+    const email = prompt("请输入你注册时的邮箱 / Please enter your registered email:");
+    if (!email) return;
+
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://www.ryanrochad.com/reset-password.html"
+    });
+
+    if (error) alert("发送失败：" + error.message);
+    else alert("重置密码邮件已发送，请检查你的邮箱！");
   });
 });
 </script>
 </body>
+
 
 </html>
