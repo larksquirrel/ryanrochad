@@ -44,5 +44,22 @@
 2. Supabase数据库配置
     a. 更改注册Email内容为RR指定内容（由其他同事提供文案）：Authentication——Emails——Confirm sign up
 
+2025/11/14
+1. 更新代码及github链接：
+    a. dl.html的ForgetPassword改为动态更新密码
+    b. 新建resent-password.html用以实现【更新密码功能】
+2. Supabase数据库配置
+    a. 更改注册Email内容中的用户名
+
+2025/11/20
+1. 更新代码及github链接：
+    a. resent-password.html界面排版优化更新
+        尝试原有排版并提供6种新排版界面供选择
+
+2025/11/22
+1. 更新代码
+    a. 全部html页面的icon设置为Ryanrochad.png图标
+    b. index.html和contact.html的“SLeave your contact information”拼写错误更正为“Leave your contact information”
+    c. dl.html的输入密码input的密码显示/隐藏，内置的小眼睛无法更改
 
 
